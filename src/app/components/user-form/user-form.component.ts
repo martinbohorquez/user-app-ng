@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
 import { User } from '../../models/users';
@@ -12,7 +12,7 @@ import { SharingDataService } from '../../services/sharing-data.service';
 	styleUrl: './user-form.component.css'
 })
 export class UserFormComponent {
-	@Input() user: User;
+	user: User;
 
 	constructor(private sharingData: SharingDataService, private router: Router) {
 		if (this.router.getCurrentNavigation()?.extras.state) {
