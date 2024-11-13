@@ -1,18 +1,24 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter } from '@angular/core';
+import { Router, RouterModule } from '@angular/router';
 import { User } from '../../models/users';
 
 @Component({
 	selector: 'user',
 	standalone: true,
-	imports: [],
+	imports: [RouterModule],
 	templateUrl: './user.component.html',
 	styleUrl: './user.component.css'
 })
 export class UserComponent {
-	@Input() users: User[] = [];
+	title: string = 'Listado de usuarios!';
+	users: User[] = [];
 
-	@Output() idUserEventEmitter: EventEmitter<number> = new EventEmitter();
-	@Output() selectedUserEventEmitter: EventEmitter<User> = new EventEmitter();
+	idUserEventEmitter: EventEmitter<number> = new EventEmitter();
+	selectedUserEventEmitter: EventEmitter<User> = new EventEmitter();
+
+	constructor(private router: Router) {
+		this.users = this.router.getCurrentNavigation()?.extras.state!['users'];
+	}
 
 	onRemoveUser(id: number): void {
 		this.idUserEventEmitter.emit(id);

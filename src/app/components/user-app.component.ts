@@ -1,14 +1,14 @@
 import { Component, OnInit } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
 import Swal from 'sweetalert2';
 import { User } from '../models/users';
 import { UserService } from '../services/user.service';
-import { UserFormComponent } from './user-form/user-form.component';
-import { UserComponent } from './user/user.component';
+import { NavbarComponent } from './navbar/navbar.component';
 
 @Component({
 	selector: 'user-app',
 	standalone: true,
-	imports: [UserComponent, UserFormComponent],
+	imports: [RouterOutlet, NavbarComponent],
 	templateUrl: './user-app.component.html',
 	styleUrl: './user-app.component.css'
 })
@@ -16,7 +16,6 @@ export class UserAppComponent implements OnInit {
 	title: string = 'Listado de usuarios!';
 	users: User[] = [];
 	userSelected: User;
-	open: boolean = false;
 	private counterId = 2;
 
 	constructor(private service: UserService) {
@@ -38,7 +37,6 @@ export class UserAppComponent implements OnInit {
 			icon: 'success'
 		});
 		this.userSelected = new User();
-		this.setOpen();
 	}
 
 	removeUser(id: number): void {
@@ -67,10 +65,5 @@ export class UserAppComponent implements OnInit {
 
 	selectUser(userRow: User): void {
 		this.userSelected = { ...userRow };
-		this.open = true;
-	}
-
-	setOpen() {
-		this.open = !this.open;
 	}
 }
