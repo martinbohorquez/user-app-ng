@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Router, RouterOutlet } from '@angular/router';
 import Swal from 'sweetalert2';
 import { User } from '../models/users';
+import { SharingDataService } from '../services/sharing-data.service';
 import { UserService } from '../services/user.service';
 import { NavbarComponent } from './navbar/navbar.component';
 
@@ -13,57 +14,62 @@ import { NavbarComponent } from './navbar/navbar.component';
 	styleUrl: './user-app.component.css'
 })
 export class UserAppComponent implements OnInit {
-	title: string = 'Listado de usuarios!';
 	users: User[] = [];
-	userSelected: User;
 	private counterId = 2;
 
-	constructor(private service: UserService) {
-		this.userSelected = new User();
-	}
+	constructor(private service: UserService, private sharingData: SharingDataService, private router: Router) {}
 
 	ngOnInit(): void {
 		this.service.findAll().subscribe((users) => (this.users = users));
+		this.addUser();
+		this.removeUser();
 	}
 
-	addUser(user: User): void {
-		this.users =
-			user.id > 0
-				? this.users.map((u) => (u.id == user.id ? { ...user } : u))
-				: [...this.users, { ...user, id: ++this.counterId }];
-		Swal.fire({
-			title: 'Guardado!',
-			text: "Usuario '" + user.username + "' guardado con éxito!",
-			icon: 'success'
-		});
-		this.userSelected = new User();
-	}
+	addUser(): void {
+		this.sharingData.newUserEventEmitter.subscribe((user) => {
+			this.users =
+				user.id > 0
+					? this.users.map((u) => (u.id == user.id ? { ...user } : u))
+					: [...this.users, { ...user, id: ++this.counterId }];
 
-	removeUser(id: number): void {
-		console.log(this.users);
-		const username: string = this.users.filter((user) => user.id == id).map(({ username }) => username)[0];
+			this.router.navigate(['/users'], { state: { users: this.users } });
 
-		Swal.fire({
-			title: 'Seguro que desea eliminar?',
-			text: "Cuidado el '" + username + "' será eliminado del sistema!",
-			icon: 'warning',
-			showCancelButton: true,
-			confirmButtonColor: '#3085d6',
-			cancelButtonColor: '#d33',
-			confirmButtonText: 'Sí'
-		}).then((result) => {
-			if (result.isConfirmed) {
-				this.users = this.users.filter((user) => user.id != id);
-				Swal.fire({
-					title: 'Eliminado!',
-					text: "Usuario '" + username + "' eliminado con éxito!",
-					icon: 'success'
-				});
-			}
+			Swal.fire({
+				title: 'Guardado!',
+				text: "Usuario '" + user.username + "' guardado con éxito!",
+				icon: 'success'
+			});
 		});
 	}
 
-	selectUser(userRow: User): void {
-		this.userSelected = { ...userRow };
+	removeUser(): void {
+		this.sharingData.idUserEventEmitter.subscribe((id) => {
+			console.log(this.users);
+			const username: string = this.users.filter((user) => user.id == id).map(({ username }) => username)[0];
+
+			Swal.fire({
+				title: 'Seguro que desea eliminar?',
+				text: "Cuidado el '" + username + "' será eliminado del sistema!",
+				icon: 'warning',
+				showCancelButton: true,
+				confirmButtonColor: '#3085d6',
+				cancelButtonColor: '#d33',
+				confirmButtonText: 'Sí'
+			}).then((result) => {
+				if (result.isConfirmed) {
+					this.users = this.users.filter((user) => user.id != id);
+
+					this.router.navigateByUrl('/users/create', { skipLocationChange: true }).then(() => {
+						this.router.navigate(['/users'], { state: { users: this.users } });
+					});
+
+					Swal.fire({
+						title: 'Eliminado!',
+						text: "Usuario '" + username + "' eliminado con éxito!",
+						icon: 'success'
+					});
+				}
+			});
+		});
 	}
 }

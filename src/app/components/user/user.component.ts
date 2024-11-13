@@ -1,6 +1,8 @@
-import { Component, EventEmitter } from '@angular/core';
+import { Component } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { User } from '../../models/users';
+import { SharingDataService } from '../../services/sharing-data.service';
+import { UserService } from '../../services/user.service';
 
 @Component({
 	selector: 'user',
@@ -13,18 +15,19 @@ export class UserComponent {
 	title: string = 'Listado de usuarios!';
 	users: User[] = [];
 
-	idUserEventEmitter: EventEmitter<number> = new EventEmitter();
-	selectedUserEventEmitter: EventEmitter<User> = new EventEmitter();
-
-	constructor(private router: Router) {
-		this.users = this.router.getCurrentNavigation()?.extras.state!['users'];
+	constructor(private service: UserService, private sharingData: SharingDataService, private router: Router) {
+		if (this.router.getCurrentNavigation()?.extras.state) {
+			this.users = this.router.getCurrentNavigation()?.extras.state!['users'];
+		} else {
+			this.service.findAll().subscribe((users) => (this.users = users));
+		}
 	}
 
 	onRemoveUser(id: number): void {
-		this.idUserEventEmitter.emit(id);
+		this.sharingData.idUserEventEmitter.emit(id);
 	}
 
 	onSelectedUser(user: User): void {
-		this.selectedUserEventEmitter.emit(user);
+		this.router.navigate(['/users/edit', user.id], { state: { user } });
 	}
 }
