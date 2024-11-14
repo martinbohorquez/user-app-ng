@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { User } from '../../models/users';
 import { SharingDataService } from '../../services/sharing-data.service';
@@ -11,14 +11,19 @@ import { UserService } from '../../services/user.service';
 	templateUrl: './user.component.html',
 	styleUrl: './user.component.css'
 })
-export class UserComponent {
+export class UserComponent implements OnInit {
 	title: string = 'Listado de usuarios!';
 	users: User[] = [];
 
 	constructor(private service: UserService, private sharingData: SharingDataService, private router: Router) {
 		if (this.router.getCurrentNavigation()?.extras.state) {
 			this.users = this.router.getCurrentNavigation()?.extras.state!['users'];
-		} else {
+		}
+	}
+
+	ngOnInit(): void {
+		if (this.users == undefined || this.users == null || this.users.length == 0) {
+			console.log('findAll');
 			this.service.findAll().subscribe((users) => (this.users = users));
 		}
 	}
@@ -28,6 +33,6 @@ export class UserComponent {
 	}
 
 	onSelectedUser(user: User): void {
-		this.router.navigate(['/users/edit', user.id], { state: { user } });
+		this.router.navigate(['/users/edit', user.id]);
 	}
 }

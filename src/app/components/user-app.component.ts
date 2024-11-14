@@ -36,15 +36,17 @@ export class UserAppComponent implements OnInit {
 		this.sharingData.newUserEventEmitter.subscribe((user) => {
 			if (user.id > 0) {
 				this.service.update(user).subscribe((userUpdated) => {
-					this.users = this.users.map((u) => (u.id == user.id ? { ...user } : u));
+					this.users = this.users.map((u) => (u.id == userUpdated.id ? { ...userUpdated } : u));
+
+					this.router.navigate(['/users'], { state: { users: this.users } });
 				});
 			} else {
 				this.service.create(user).subscribe((userNew) => {
 					this.users = [...this.users, { ...userNew }];
+
+					this.router.navigate(['/users'], { state: { users: this.users } });
 				});
 			}
-
-			this.router.navigate(['/users']);
 
 			Swal.fire({
 				title: 'Guardado!',
@@ -56,7 +58,6 @@ export class UserAppComponent implements OnInit {
 
 	removeUser(): void {
 		this.sharingData.idUserEventEmitter.subscribe((id) => {
-			console.log(this.users);
 			const username: string = this.users.filter((user) => user.id == id).map(({ username }) => username)[0];
 
 			Swal.fire({
@@ -69,10 +70,12 @@ export class UserAppComponent implements OnInit {
 				confirmButtonText: 'Sí'
 			}).then((result) => {
 				if (result.isConfirmed) {
-					this.users = this.users.filter((user) => user.id != id);
+					this.service.remove(id).subscribe(() => {
+						this.users = this.users.filter((user) => user.id != id);
 
-					this.router.navigateByUrl('/users/create', { skipLocationChange: true }).then(() => {
-						this.router.navigate(['/users'], { state: { users: this.users } });
+						this.router.navigateByUrl('/users/create', { skipLocationChange: true }).then(() => {
+							this.router.navigate(['/users'], { state: { users: this.users } });
+						});
 					});
 
 					Swal.fire({
