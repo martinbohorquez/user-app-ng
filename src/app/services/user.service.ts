@@ -1,33 +1,30 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { Observable } from 'rxjs';
 import { User } from '../models/users';
 
 @Injectable({
 	providedIn: 'root'
 })
 export class UserService {
-	private users: User[] = [
-		{
-			id: 1,
-			name: 'Kate',
-			lastname: 'Sam',
-			email: 'kate.sam@gmail.com',
-			username: 'katesam',
-			password: '123456'
-		},
-		{
-			id: 2,
-			name: 'Jim',
-			lastname: 'Mez',
-			email: 'jim.mez@gmail.com',
-			username: 'jimmez',
-			password: '123456'
-		}
-	];
+	private url: string = 'http://localhost:8080/api/users';
+	private users: User[] = [];
 
-	constructor() {}
+	constructor(private http: HttpClient) {}
 
 	findAll(): Observable<User[]> {
-		return of(this.users);
+		return this.http.get<User[]>(this.url);
+	}
+
+	findById(id: number): Observable<User> {
+		return this.http.get<User>(`${this.url}/${id}`);
+	}
+
+	create(user: User): Observable<User> {
+		return this.http.post<User>(this.url, user);
+	}
+
+	update(user: User): Observable<User> {
+		return this.http.put<User>(`${this.url}/${user.id}`, user);
 	}
 }

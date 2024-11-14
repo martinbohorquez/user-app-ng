@@ -15,7 +15,6 @@ import { NavbarComponent } from './navbar/navbar.component';
 })
 export class UserAppComponent implements OnInit {
 	users: User[] = [];
-	private counterId = 2;
 
 	constructor(private service: UserService, private sharingData: SharingDataService, private router: Router) {}
 
@@ -35,12 +34,17 @@ export class UserAppComponent implements OnInit {
 
 	addUser(): void {
 		this.sharingData.newUserEventEmitter.subscribe((user) => {
-			this.users =
-				user.id > 0
-					? this.users.map((u) => (u.id == user.id ? { ...user } : u))
-					: [...this.users, { ...user, id: ++this.counterId }];
+			if (user.id > 0) {
+				this.service.update(user).subscribe((userUpdated) => {
+					this.users = this.users.map((u) => (u.id == user.id ? { ...user } : u));
+				});
+			} else {
+				this.service.create(user).subscribe((userNew) => {
+					this.users = [...this.users, { ...userNew }];
+				});
+			}
 
-			this.router.navigate(['/users'], { state: { users: this.users } });
+			this.router.navigate(['/users']);
 
 			Swal.fire({
 				title: 'Guardado!',
