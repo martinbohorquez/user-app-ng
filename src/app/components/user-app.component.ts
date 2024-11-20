@@ -15,11 +15,13 @@ import { NavbarComponent } from './navbar/navbar.component';
 })
 export class UserAppComponent implements OnInit {
 	users: User[] = [];
+	usersInitial: User[] = [];
 
 	constructor(private service: UserService, private sharingData: SharingDataService, private router: Router) {}
 
 	ngOnInit(): void {
 		this.service.findAll().subscribe((users) => (this.users = users));
+		this.usersInitial = this.users;
 		this.addUser();
 		this.removeUser();
 		this.findUserById();
@@ -35,25 +37,48 @@ export class UserAppComponent implements OnInit {
 	addUser(): void {
 		this.sharingData.newUserEventEmitter.subscribe((user) => {
 			if (user.id > 0) {
-				this.service.update(user).subscribe((userUpdated) => {
-					this.users = this.users.map((u) => (u.id == userUpdated.id ? { ...userUpdated } : u));
+				this.service.update(user).subscribe({
+					next: (userUpdated) => {
+						this.users = this.users.map((u) => (u.id == userUpdated.id ? { ...userUpdated } : u));
 
-					this.router.navigate(['/users'], { state: { users: this.users } });
+						this.router.navigate(['/users'], { state: { users: this.users } });
+
+						Swal.fire({
+							title: 'Actualizado usuario!',
+							text: "Usuario '" + user.username + "' editado con éxito!",
+							icon: 'success'
+						});
+					},
+					error: (err) => {
+						this.errorResponse(err);
+					}
 				});
 			} else {
-				this.service.create(user).subscribe((userNew) => {
-					this.users = [...this.users, { ...userNew }];
+				this.service.create(user).subscribe({
+					next: (userNew) => {
+						this.users = [...this.users, { ...userNew }];
 
-					this.router.navigate(['/users'], { state: { users: this.users } });
+						this.router.navigate(['/users'], { state: { users: this.users } });
+
+						Swal.fire({
+							title: 'Creado nuevo usuario!',
+							text: "Usuario '" + user.username + "' creado con éxito!",
+							icon: 'success'
+						});
+					},
+					error: (err) => {
+						this.errorResponse(err);
+					}
 				});
 			}
-
-			Swal.fire({
-				title: 'Guardado!',
-				text: "Usuario '" + user.username + "' guardado con éxito!",
-				icon: 'success'
-			});
 		});
+	}
+
+	private errorResponse(err: any) {
+		if (err.status == 400) {
+			// console.log(err.error);
+			this.sharingData.errorUserFormEventEmitter.emit(err.error.errors);
+		}
 	}
 
 	removeUser(): void {

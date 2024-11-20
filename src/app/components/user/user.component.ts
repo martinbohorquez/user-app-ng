@@ -32,7 +32,7 @@ export class UserComponent implements OnInit {
 		this.sharingData.idUserEventEmitter.emit(id);
 	}
 
-	onSelectedUser(user: User): void {
-		this.router.navigate(['/users/edit', user.id]);
-	}
+	// onSelectedUser(user: User): void {
+	// 	this.router.navigate(['/users/edit', user.id]);
+	// }
 }
