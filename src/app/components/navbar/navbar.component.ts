@@ -11,4 +11,5 @@ import { User } from '../../models/users';
 })
 export class NavbarComponent {
 	@Input() users: User[] = [];
+	@Input() paginator: any = {};
 }

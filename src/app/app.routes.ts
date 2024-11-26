@@ -13,6 +13,10 @@ export const routes: Routes = [
 		component: UserComponent
 	},
 	{
+		path: 'users/page/:page',
+		component: UserComponent
+	},
+	{
 		path: 'users/create',
 		component: UserFormComponent
 	},
