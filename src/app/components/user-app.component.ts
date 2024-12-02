@@ -36,6 +36,13 @@ export class UserAppComponent implements OnInit {
 		this.removeUser();
 		this.findUserById();
 		this.pageUserEvent();
+		this.handlerLogin();
+	}
+
+	handlerLogin() {
+		this.sharingData.handlerLoginEventEmitter.subscribe(({ username, password }) => {
+			console.log(username + ' ' + password);
+		});
 	}
 
 	pageUserEvent() {
