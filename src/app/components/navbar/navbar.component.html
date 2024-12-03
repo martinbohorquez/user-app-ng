@@ -11,14 +11,21 @@
                     <a class="nav-link active" aria-current="page" [routerLink]="['/users']"
                         [state]="{users, paginator}">Home</a>
                 </li>
+                @if (admin) {
                 <li class="nav-item">
                     <a class="nav-link" [routerLink]="['/users/create']">New User</a>
                 </li>
+                }
             </ul>
         </div>
         <div class="collapse navbar-collapse justify-content-end" id="navbarAuth">
             <span class="nav-item nav-link text-primary mx-3">
+                @if (login.isAuth) {
+                {{ login.user.username }}
+                <button (click)="handlerLogout()" class="btn btn-outline-success">Logout</button>
+                } @else {
                 <a class="btn btn-outline-primary" [routerLink]="['/login']">Sign in</a>
+                }
             </span>
 
         </div>
