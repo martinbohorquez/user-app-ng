@@ -84,6 +84,7 @@
                     </div>
                     }
                     } -->
+                    @if (user.id == 0) {
                     <input type="password" name="password" placeholder="Password" [(ngModel)]="user.password"
                         class="form-control my-2" #password="ngModel"><!-- required minlength="6" -->
                     @if (errors?.password) {
@@ -106,6 +107,7 @@
                     </div>
                     }
                     } -->
+                    }
                 </div>
                 <div>
                     <button type="submit" class="btn btn-primary m-2"> <!-- [disabled]="userForm.invalid" -->
