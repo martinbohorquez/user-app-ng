@@ -1,10 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
+import { Store } from '@ngrx/store';
 import Swal from 'sweetalert2';
 import { User } from '../models/users';
 import { AuthService } from '../services/auth.service';
 import { SharingDataService } from '../services/sharing-data.service';
 import { UserService } from '../services/user.service';
+import { add, find, remove, setPaginator, update } from '../store/users.action';
+import { findAll } from './../store/users.action';
 import { NavbarComponent } from './navbar/navbar.component';
 
 @Component({
@@ -18,21 +21,24 @@ export class UserAppComponent implements OnInit {
 	users: User[] = [];
 	usersInitial: User[] = [];
 	paginator: any = {};
+	user!: User;
 
 	constructor(
 		private service: UserService,
 		private sharingData: SharingDataService,
 		private authService: AuthService,
 		private router: Router,
-		private route: ActivatedRoute
-	) {}
+		private route: ActivatedRoute,
+		private store: Store<{ users: any }>
+	) {
+		this.store.select('users').subscribe((state) => {
+			this.users = state.users;
+			this.paginator = state.paginator;
+			this.user = { ...state.user };
+		});
+	}
 
 	ngOnInit(): void {
-		// this.service.findAll().subscribe((users) => (this.users = users));
-		// this.route.paramMap.subscribe((params) => {
-		// 	const page: number = +(params.get('page') || '0');
-		// 	this.service.findAllPegeable(page).subscribe((pegeable) => (this.users = pegeable.content as User[]));
-		// });
 		this.usersInitial = this.users;
 		this.addUser();
 		this.removeUser();
@@ -75,15 +81,18 @@ export class UserAppComponent implements OnInit {
 
 	pageUserEvent() {
 		this.sharingData.pageUsersEventEmitter.subscribe((pegeable) => {
-			this.users = pegeable.users;
-			this.paginator = pegeable.paginator;
+			// this.users = pegeable.users;
+			// this.paginator = pegeable.paginator;
+			this.store.dispatch(findAll({ users: pegeable.users }));
+			this.store.dispatch(setPaginator({ paginator: pegeable.paginator }));
 		});
 	}
 
 	findUserById() {
 		this.sharingData.findUserByIdEventEmitter.subscribe((id) => {
-			const user = this.users.find((user) => user.id == id);
-			this.sharingData.selectUserEventEmitter.emit(user);
+			// const user = this.users.find((user) => user.id == id);
+			this.store.dispatch(find({ id }));
+			this.sharingData.selectUserEventEmitter.emit(this.user);
 		});
 	}
 
@@ -92,7 +101,8 @@ export class UserAppComponent implements OnInit {
 			if (user.id > 0) {
 				this.service.update(user).subscribe({
 					next: (userUpdated) => {
-						this.users = this.users.map((u) => (u.id == userUpdated.id ? { ...userUpdated } : u));
+						// this.users = this.users.map((u) => (u.id == userUpdated.id ? { ...userUpdated } : u));
+						this.store.dispatch(update({ userUpdated }));
 
 						this.router.navigate(['/users/'], { state: { users: this.users, paginator: this.paginator } });
 
@@ -109,7 +119,8 @@ export class UserAppComponent implements OnInit {
 			} else {
 				this.service.create(user).subscribe({
 					next: (userNew) => {
-						this.users = [...this.users, { ...userNew }];
+						// this.users = [...this.users, { ...userNew }];
+						this.store.dispatch(add({ userNew }));
 
 						this.router.navigate([
 							'/users/page',
@@ -155,7 +166,8 @@ export class UserAppComponent implements OnInit {
 			}).then((result) => {
 				if (result.isConfirmed) {
 					this.service.remove(id).subscribe(() => {
-						this.users = this.users.filter((user) => user.id != id);
+						// this.users = this.users.filter((user) => user.id != id);
+						this.store.dispatch(remove({ id }));
 
 						this.router.navigateByUrl('/users/create', { skipLocationChange: true }).then(() => {
 							this.router.navigate([
