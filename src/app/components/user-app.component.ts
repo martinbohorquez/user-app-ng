@@ -104,7 +104,13 @@ export class UserAppComponent implements OnInit {
 						// this.users = this.users.map((u) => (u.id == userUpdated.id ? { ...userUpdated } : u));
 						this.store.dispatch(update({ userUpdated }));
 
-						this.router.navigate(['/users/'], { state: { users: this.users, paginator: this.paginator } });
+						// this.router.navigate(['/users/'], { state: { users: this.users, paginator: this.paginator } });
+						this.router.navigate([
+							'/users/page',
+							(this.paginator.totalElements + 1) % this.paginator.size == 0
+								? this.paginator.totalPages - 1
+								: this.paginator.totalPages
+						]);
 
 						Swal.fire({
 							title: 'Actualizado usuario!',
