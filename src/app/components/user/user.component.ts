@@ -37,9 +37,7 @@ export class UserComponent implements OnInit {
 	}
 
 	ngOnInit(): void {
-		// if (this.users == undefined || this.users == null || this.users.length == 0) {
 		console.log('findAll');
-		// this.service.findAll().subscribe((users) => (this.users = users));
 		this.route.paramMap.subscribe((params) => {
 			const page: number = +(params.get('page') || '0');
 			if (page < 0) this.router.navigate(['/users/page', 0]);
@@ -47,16 +45,11 @@ export class UserComponent implements OnInit {
 				this.store.dispatch(load({ page }));
 			}
 		});
-		// }
 	}
 
 	onRemoveUser(id: number): void {
 		this.sharingData.idUserEventEmitter.emit(id);
 	}
-
-	// onSelectedUser(user: User): void {
-	// 	this.router.navigate(['/users/edit', user.id]);
-	// }
 
 	get admin() {
 		return this.authService.isAdmin();

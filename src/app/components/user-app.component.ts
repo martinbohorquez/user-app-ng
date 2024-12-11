@@ -39,7 +39,7 @@ export class UserAppComponent implements OnInit {
 		this.addUser();
 		this.removeUser();
 		this.findUserById();
-		// this.pageUserEvent();
+		this.pageUserEvent();
 		this.handlerLogin();
 	}
 
@@ -77,8 +77,6 @@ export class UserAppComponent implements OnInit {
 
 	pageUserEvent() {
 		this.sharingData.pageUsersEventEmitter.subscribe((pageable) => {
-			// this.users = pageable.users;
-			// this.paginator = pageable.paginator;
 			this.store.dispatch(findAll({ users: pageable.users }));
 			this.store.dispatch(setPaginator({ paginator: pageable.paginator }));
 		});
@@ -86,7 +84,6 @@ export class UserAppComponent implements OnInit {
 
 	findUserById() {
 		this.sharingData.findUserByIdEventEmitter.subscribe((id) => {
-			// const user = this.users.find((user) => user.id == id);
 			this.store.dispatch(find({ id }));
 			this.sharingData.selectUserEventEmitter.emit(this.user);
 		});
@@ -97,17 +94,8 @@ export class UserAppComponent implements OnInit {
 			if (user.id > 0) {
 				this.service.update(user).subscribe({
 					next: (userUpdated) => {
-						// this.users = this.users.map((u) => (u.id == userUpdated.id ? { ...userUpdated } : u));
 						this.store.dispatch(update({ userUpdated }));
-
-						// this.router.navigate(['/users/'], { state: { users: this.users, paginator: this.paginator } });
 						this.router.navigate(['/users']);
-						// this.router.navigate([
-						// 	'/users',
-						// 	(this.paginator.totalElements + 1) % this.paginator.size == 0
-						// 		? this.paginator.totalPages - 1
-						// 		: this.paginator.totalPages
-						// ]);
 
 						Swal.fire({
 							title: 'Actualizado usuario!',
@@ -122,16 +110,7 @@ export class UserAppComponent implements OnInit {
 			} else {
 				this.service.create(user).subscribe({
 					next: (userNew) => {
-						// this.users = [...this.users, { ...userNew }];
 						this.store.dispatch(add({ userNew }));
-
-						// this.router.navigate([
-						// 	'/users/page',
-						// 	(this.paginator.totalElements + 1) % this.paginator.size == 0
-						// 		? this.paginator.totalPages - 1
-						// 		: this.paginator.totalPages
-						// ]);
-						// this.router.navigate(['/users'], { state: { users: this.users, paginator: this.paginator } });
 						this.router.navigate(['/users']);
 
 						Swal.fire({
@@ -150,7 +129,6 @@ export class UserAppComponent implements OnInit {
 
 	private errorResponse(err: any) {
 		if (err.status == 400) {
-			// console.log(err.error);
 			this.sharingData.errorUserFormEventEmitter.emit(err.error.errors);
 		}
 	}
@@ -170,17 +148,9 @@ export class UserAppComponent implements OnInit {
 			}).then((result) => {
 				if (result.isConfirmed) {
 					this.service.remove(id).subscribe(() => {
-						// this.users = this.users.filter((user) => user.id != id);
 						this.store.dispatch(remove({ id }));
 
 						this.router.navigateByUrl('/users/create', { skipLocationChange: true }).then(() => {
-							// this.router.navigate([
-							// 	'/users/page',
-							// 	(this.paginator.totalElements - 1) % this.paginator.size == 0
-							// 		? this.paginator.number - 1
-							// 		: this.paginator.number
-							// ]);
-							// this.router.navigate(['/users'], { state: { users: this.users, paginator: this.paginator } });
 							this.router.navigate(['/users']);
 						});
 					});
