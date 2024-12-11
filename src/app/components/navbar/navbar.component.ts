@@ -1,6 +1,5 @@
-import { Component, Input } from '@angular/core';
+import { Component } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
-import { User } from '../../models/users';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
@@ -12,9 +11,6 @@ import { AuthService } from '../../services/auth.service';
 })
 export class NavbarComponent {
 	constructor(private authService: AuthService, private router: Router) {}
-
-	@Input() users: User[] = [];
-	@Input() paginator: any = {};
 
 	get login() {
 		return this.authService.user;

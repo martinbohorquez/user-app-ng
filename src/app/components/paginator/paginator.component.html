@@ -1,20 +1,20 @@
 @if (paginator.totalPages > 1 && paginator.number >= 0 && paginator.totalPages > paginator.number) {
 <ul class="pagination">
-    <li class="page-item">
+    <li class="page-item" [class.disabled]="paginator.first">
         <a class="page-link" [routerLink]="[url, 0]">
             <i class="bi bi-skip-start"></i>
         </a>
     </li>
-    <li class="page-item" [class.disabled]="paginator.number == 0">
+    <li class="page-item" [class.disabled]="paginator.first">
         <a class="page-link" [routerLink]="[url, paginator.number - 1]">
             <i class="bi bi-arrow-left-square"></i>
         </a>
     </li>
-    <li class="page-item" [class.disabled]="paginator.number == paginator.totalPages - 1">
+    <li class="page-item" [class.disabled]="paginator.last">
         <a class="page-link" [routerLink]="[url, paginator.number + 1]">
             <i class="bi bi-arrow-right-square"></i></a>
     </li>
-    <li class="page-item">
+    <li class="page-item" [class.disabled]="paginator.last">
         <a class="page-link" [routerLink]="[url, paginator.totalPages - 1]">
             <i class="bi bi-skip-end"></i>
         </a>

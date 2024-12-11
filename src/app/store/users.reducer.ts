@@ -7,11 +7,6 @@ const user: User = new User();
 
 export const usersReducer = createReducer(
 	{ users, paginator: {}, user },
-	// on(load, (state, { page }) => ({
-	// 	users: state.users,
-	// 	paginator: state.paginator,
-	// 	user: state.user
-	// })),
 	on(findAll, (state, { users }) => ({
 		users: [...users],
 		paginator: state.paginator,

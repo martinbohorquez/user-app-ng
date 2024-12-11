@@ -1,9 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { Store } from '@ngrx/store';
 import { User } from '../../models/users';
 import { AuthService } from '../../services/auth.service';
 import { SharingDataService } from '../../services/sharing-data.service';
 import { UserService } from '../../services/user.service';
+import { load } from '../../store/users.action';
 import { PaginatorComponent } from '../paginator/paginator.component';
 
 @Component({
@@ -21,37 +23,31 @@ export class UserComponent implements OnInit {
 	paginator: any = {};
 
 	constructor(
+		private store: Store<{ users: any }>,
 		private service: UserService,
 		private sharingData: SharingDataService,
 		private authService: AuthService,
 		private router: Router,
 		private route: ActivatedRoute
 	) {
-		if (this.router.getCurrentNavigation()?.extras.state) {
-			this.users = this.router.getCurrentNavigation()?.extras.state!['users'];
-			this.paginator = this.router.getCurrentNavigation()?.extras.state!['paginator'];
-		}
+		this.store.select('users').subscribe((state) => {
+			this.users = state.users;
+			this.paginator = state.paginator;
+		});
 	}
 
 	ngOnInit(): void {
-		if (this.users == undefined || this.users == null || this.users.length == 0) {
-			console.log('findAll');
-			// this.service.findAll().subscribe((users) => (this.users = users));
-			this.route.paramMap.subscribe((params) => {
-				const page: number = +(params.get('page') || '0');
-				if (page < 0) this.router.navigate(['/users/page', 0]);
-				else {
-					this.service.findAllPegeable(page).subscribe((pegeable) => {
-						if (page > pegeable.totalPages - 1) this.router.navigate(['/users/page', pegeable.totalPages - 1]);
-						else {
-							this.users = pegeable.content as User[];
-							this.paginator = pegeable;
-							this.sharingData.pageUsersEventEmitter.emit({ users: this.users, paginator: this.paginator });
-						}
-					});
-				}
-			});
-		}
+		// if (this.users == undefined || this.users == null || this.users.length == 0) {
+		console.log('findAll');
+		// this.service.findAll().subscribe((users) => (this.users = users));
+		this.route.paramMap.subscribe((params) => {
+			const page: number = +(params.get('page') || '0');
+			if (page < 0) this.router.navigate(['/users/page', 0]);
+			else {
+				this.store.dispatch(load({ page }));
+			}
+		});
+		// }
 	}
 
 	onRemoveUser(id: number): void {

@@ -19,8 +19,6 @@ import { NavbarComponent } from './navbar/navbar.component';
 })
 export class UserAppComponent implements OnInit {
 	users: User[] = [];
-	usersInitial: User[] = [];
-	paginator: any = {};
 	user!: User;
 
 	constructor(
@@ -33,17 +31,15 @@ export class UserAppComponent implements OnInit {
 	) {
 		this.store.select('users').subscribe((state) => {
 			this.users = state.users;
-			this.paginator = state.paginator;
 			this.user = { ...state.user };
 		});
 	}
 
 	ngOnInit(): void {
-		this.usersInitial = this.users;
 		this.addUser();
 		this.removeUser();
 		this.findUserById();
-		this.pageUserEvent();
+		// this.pageUserEvent();
 		this.handlerLogin();
 	}
 
@@ -80,11 +76,11 @@ export class UserAppComponent implements OnInit {
 	}
 
 	pageUserEvent() {
-		this.sharingData.pageUsersEventEmitter.subscribe((pegeable) => {
-			// this.users = pegeable.users;
-			// this.paginator = pegeable.paginator;
-			this.store.dispatch(findAll({ users: pegeable.users }));
-			this.store.dispatch(setPaginator({ paginator: pegeable.paginator }));
+		this.sharingData.pageUsersEventEmitter.subscribe((pageable) => {
+			// this.users = pageable.users;
+			// this.paginator = pageable.paginator;
+			this.store.dispatch(findAll({ users: pageable.users }));
+			this.store.dispatch(setPaginator({ paginator: pageable.paginator }));
 		});
 	}
 
@@ -105,12 +101,13 @@ export class UserAppComponent implements OnInit {
 						this.store.dispatch(update({ userUpdated }));
 
 						// this.router.navigate(['/users/'], { state: { users: this.users, paginator: this.paginator } });
-						this.router.navigate([
-							'/users/page',
-							(this.paginator.totalElements + 1) % this.paginator.size == 0
-								? this.paginator.totalPages - 1
-								: this.paginator.totalPages
-						]);
+						this.router.navigate(['/users']);
+						// this.router.navigate([
+						// 	'/users',
+						// 	(this.paginator.totalElements + 1) % this.paginator.size == 0
+						// 		? this.paginator.totalPages - 1
+						// 		: this.paginator.totalPages
+						// ]);
 
 						Swal.fire({
 							title: 'Actualizado usuario!',
@@ -128,13 +125,14 @@ export class UserAppComponent implements OnInit {
 						// this.users = [...this.users, { ...userNew }];
 						this.store.dispatch(add({ userNew }));
 
-						this.router.navigate([
-							'/users/page',
-							(this.paginator.totalElements + 1) % this.paginator.size == 0
-								? this.paginator.totalPages - 1
-								: this.paginator.totalPages
-						]);
+						// this.router.navigate([
+						// 	'/users/page',
+						// 	(this.paginator.totalElements + 1) % this.paginator.size == 0
+						// 		? this.paginator.totalPages - 1
+						// 		: this.paginator.totalPages
+						// ]);
 						// this.router.navigate(['/users'], { state: { users: this.users, paginator: this.paginator } });
+						this.router.navigate(['/users']);
 
 						Swal.fire({
 							title: 'Creado nuevo usuario!',
@@ -176,13 +174,14 @@ export class UserAppComponent implements OnInit {
 						this.store.dispatch(remove({ id }));
 
 						this.router.navigateByUrl('/users/create', { skipLocationChange: true }).then(() => {
-							this.router.navigate([
-								'/users/page',
-								(this.paginator.totalElements - 1) % this.paginator.size == 0
-									? this.paginator.number - 1
-									: this.paginator.number
-							]);
+							// this.router.navigate([
+							// 	'/users/page',
+							// 	(this.paginator.totalElements - 1) % this.paginator.size == 0
+							// 		? this.paginator.number - 1
+							// 		: this.paginator.number
+							// ]);
 							// this.router.navigate(['/users'], { state: { users: this.users, paginator: this.paginator } });
+							this.router.navigate(['/users']);
 						});
 					});
 
