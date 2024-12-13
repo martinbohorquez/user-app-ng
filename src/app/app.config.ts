@@ -7,6 +7,7 @@ import { provideStore } from '@ngrx/store';
 import { provideStoreDevtools } from '@ngrx/store-devtools';
 import { routes } from './app.routes';
 import { tokenInterceptor } from './interceptors/token.interceptor';
+import { AuthEffects } from './store/auth/auth.effects';
 import { authReducer } from './store/auth/auth.reducer';
 import { UserEffects } from './store/users/users.effects';
 import { usersReducer } from './store/users/users.reducer';
@@ -20,7 +21,7 @@ export const appConfig: ApplicationConfig = {
 			users: usersReducer,
 			auth: authReducer
 		}),
-		provideEffects(UserEffects),
+		provideEffects(UserEffects, AuthEffects),
 		provideStoreDevtools({ maxAge: 25, logOnly: !isDevMode() })
 	]
 };

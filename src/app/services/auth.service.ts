@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
-import { login, logout } from '../store/auth/auth.actions';
+import { logout } from '../store/auth/auth.actions';
 
 @Injectable({
 	providedIn: 'root'
@@ -23,7 +23,6 @@ export class AuthService {
 	}
 
 	set user(user: any) {
-		this.store.dispatch(login({ login: user }));
 		sessionStorage.setItem('login', JSON.stringify(user));
 	}
 
