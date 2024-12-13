@@ -3,8 +3,8 @@ import { Router } from '@angular/router';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { catchError, exhaustMap, map, of, tap } from 'rxjs';
 import Swal from 'sweetalert2';
-import { User } from '../models/users';
-import { UserService } from '../services/user.service';
+import { User } from '../../models/users';
+import { UserService } from '../../services/user.service';
 import {
 	add,
 	addSuccess,

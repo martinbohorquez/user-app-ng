@@ -7,8 +7,9 @@ import { provideStore } from '@ngrx/store';
 import { provideStoreDevtools } from '@ngrx/store-devtools';
 import { routes } from './app.routes';
 import { tokenInterceptor } from './interceptors/token.interceptor';
-import { UserEffects } from './store/user.effects';
-import { usersReducer } from './store/users.reducer';
+import { authReducer } from './store/auth/auth.reducer';
+import { UserEffects } from './store/users/users.effects';
+import { usersReducer } from './store/users/users.reducer';
 
 export const appConfig: ApplicationConfig = {
 	providers: [
@@ -16,7 +17,8 @@ export const appConfig: ApplicationConfig = {
 		provideRouter(routes),
 		provideHttpClient(withInterceptors([tokenInterceptor])),
 		provideStore({
-			users: usersReducer
+			users: usersReducer,
+			auth: authReducer
 		}),
 		provideEffects(UserEffects),
 		provideStoreDevtools({ maxAge: 25, logOnly: !isDevMode() })

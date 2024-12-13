@@ -1,8 +1,9 @@
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
 import { User } from '../../models/users';
-import { SharingDataService } from '../../services/sharing-data.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
 	selector: 'app-auth',
@@ -14,7 +15,7 @@ import { SharingDataService } from '../../services/sharing-data.service';
 export class AuthComponent {
 	user: User;
 
-	constructor(private sharingData: SharingDataService) {
+	constructor(private authService: AuthService, private router: Router) {
 		this.user = new User();
 	}
 
@@ -26,7 +27,28 @@ export class AuthComponent {
 				icon: 'error'
 			});
 		} else {
-			this.sharingData.handlerLoginEventEmitter.emit({ username: this.user.username, password: this.user.password });
+			this.authService.loginUser({ username: this.user.username, password: this.user.password }).subscribe({
+				next: (response) => {
+					const token = response.token;
+					const payload = this.authService.getPayload(token);
+
+					this.authService.token = token;
+					this.authService.user = {
+						user: { username: payload.sub },
+						isAuth: true,
+						isAdmin: payload.isAdmin
+					};
+
+					this.router.navigate(['/users']);
+				},
+				error: (error) => {
+					if (error.status) {
+						Swal.fire('Error en el login', error.error.message, 'error');
+					} else {
+						throw error;
+					}
+				}
+			});
 		}
 	}
 }

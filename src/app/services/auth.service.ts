@@ -1,6 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
+import { login, logout } from '../store/auth/auth.actions';
 
 @Injectable({
 	providedIn: 'root'
@@ -8,47 +10,33 @@ import { Observable } from 'rxjs';
 export class AuthService {
 	private url: string = 'http://localhost:8080/login';
 
-	private _token: string | undefined;
-	private _user = {
-		user: undefined,
-		isAuth: false,
-		isAdmin: false
-	};
+	private _user: any;
 
-	constructor(private http: HttpClient) {}
+	constructor(private store: Store<{ auth: any }>, private http: HttpClient) {
+		this.store.select('auth').subscribe((state) => {
+			this._user = state;
+		});
+	}
 
 	loginUser({ username, password }: any): Observable<any> {
 		return this.http.post<any>(this.url, { username, password });
 	}
 
 	set user(user: any) {
-		this._user = user;
+		this.store.dispatch(login({ login: user }));
 		sessionStorage.setItem('login', JSON.stringify(user));
 	}
 
 	get user() {
-		if (this._user.isAuth) {
-			return this._user;
-		} else if (sessionStorage.getItem('login') != null) {
-			this._user = JSON.parse(sessionStorage.getItem('login') || '{}');
-			return this._user;
-		}
 		return this._user;
 	}
 
 	set token(token: string) {
-		this._token = token;
 		sessionStorage.setItem('token', token);
 	}
 
 	get token() {
-		if (this._token != undefined) {
-			return this._token;
-		} else if (sessionStorage.getItem('token') != null) {
-			this._token = sessionStorage.getItem('token') || '';
-			return this._token;
-		}
-		return this._token!;
+		return sessionStorage.getItem('token')!;
 	}
 
 	getPayload(token: string) {
@@ -67,12 +55,7 @@ export class AuthService {
 	}
 
 	logout() {
-		this._token = undefined;
-		this._user = {
-			user: undefined,
-			isAuth: false,
-			isAdmin: false
-		};
+		this.store.dispatch(logout());
 		sessionStorage.removeItem('login');
 		sessionStorage.removeItem('token');
 	}

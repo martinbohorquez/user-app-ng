@@ -4,7 +4,7 @@ import { Store } from '@ngrx/store';
 import Swal from 'sweetalert2';
 import { User } from '../../models/users';
 import { AuthService } from '../../services/auth.service';
-import { load, remove } from '../../store/users.action';
+import { load, remove } from '../../store/users/users.action';
 import { PaginatorComponent } from '../paginator/paginator.component';
 
 @Component({
