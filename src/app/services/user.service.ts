@@ -24,12 +24,12 @@ export class UserService {
 		return this.http.get<User>(`${this.url}/${id}`);
 	}
 
-	create(user: User): Observable<User> {
-		return this.http.post<User>(this.url, user);
+	create(user: User): Observable<{ mensaje: string; user: User }> {
+		return this.http.post<{ mensaje: string; user: User }>(this.url, user);
 	}
 
-	update(user: User): Observable<User> {
-		return this.http.put<User>(`${this.url}/${user.id}`, user);
+	update(user: User): Observable<{ mensaje: string; user: User }> {
+		return this.http.put<{ mensaje: string; user: User }>(`${this.url}/${user.id}`, user);
 	}
 
 	remove(id: number): Observable<User> {

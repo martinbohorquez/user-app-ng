@@ -1,11 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { Store } from '@ngrx/store';
+import Swal from 'sweetalert2';
 import { User } from '../../models/users';
 import { AuthService } from '../../services/auth.service';
-import { SharingDataService } from '../../services/sharing-data.service';
-import { UserService } from '../../services/user.service';
-import { load } from '../../store/users.action';
+import { load, remove } from '../../store/users.action';
 import { PaginatorComponent } from '../paginator/paginator.component';
 
 @Component({
@@ -24,8 +23,6 @@ export class UserComponent implements OnInit {
 
 	constructor(
 		private store: Store<{ users: any }>,
-		private service: UserService,
-		private sharingData: SharingDataService,
 		private authService: AuthService,
 		private router: Router,
 		private route: ActivatedRoute
@@ -37,7 +34,6 @@ export class UserComponent implements OnInit {
 	}
 
 	ngOnInit(): void {
-		console.log('findAll');
 		this.route.paramMap.subscribe((params) => {
 			const page: number = +(params.get('page') || '0');
 			if (page < 0) this.router.navigate(['/users/page', 0]);
@@ -48,7 +44,21 @@ export class UserComponent implements OnInit {
 	}
 
 	onRemoveUser(id: number): void {
-		this.sharingData.idUserEventEmitter.emit(id);
+		const username: string = this.users.filter((user) => user.id == id).map(({ username }) => username)[0];
+
+		Swal.fire({
+			title: 'Seguro que desea eliminar?',
+			text: "Cuidado el '" + username + "' será eliminado del sistema!",
+			icon: 'warning',
+			showCancelButton: true,
+			confirmButtonColor: '#3085d6',
+			cancelButtonColor: '#d33',
+			confirmButtonText: 'Sí'
+		}).then((result) => {
+			if (result.isConfirmed) {
+				this.store.dispatch(remove({ id }));
+			}
+		});
 	}
 
 	get admin() {
