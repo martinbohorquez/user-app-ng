@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { catchError, EMPTY, exhaustMap, map, of, tap } from 'rxjs';
+import { catchError, exhaustMap, map, of, tap } from 'rxjs';
 import Swal from 'sweetalert2';
 import { User } from '../models/users';
 import { UserService } from '../services/user.service';
@@ -30,7 +30,7 @@ export class UserEffects {
 						const paginator = pageable;
 						return findAllPageable({ users, paginator });
 					}),
-					catchError(() => EMPTY)
+					catchError((error) => of(error))
 				)
 			)
 		)
@@ -41,7 +41,9 @@ export class UserEffects {
 			exhaustMap((action) =>
 				this.service.create(action.userNew).pipe(
 					map((response) => addSuccess({ userNew: response.user })),
-					catchError((error) => (error.status == 400 ? of(setErrors({ errors: error.error.errors })) : EMPTY))
+					catchError((error) =>
+						error.status == 400 ? of(setErrors({ userForm: action.userNew, errors: error.error.errors })) : of(error)
+					)
 				)
 			)
 		)
@@ -68,7 +70,11 @@ export class UserEffects {
 			exhaustMap((action) =>
 				this.service.update(action.userUpdated).pipe(
 					map((response) => updateSuccess({ userUpdated: response.user })),
-					catchError((error) => (error.status == 400 ? of(setErrors({ errors: error.error.errors })) : EMPTY))
+					catchError((error) =>
+						error.status == 400
+							? of(setErrors({ userForm: action.userUpdated, errors: error.error.errors }))
+							: of(error)
+					)
 				)
 			)
 		)
@@ -92,12 +98,7 @@ export class UserEffects {
 	removeUsers$ = createEffect(() =>
 		this.actions$.pipe(
 			ofType(remove),
-			exhaustMap((action) =>
-				this.service.remove(action.id).pipe(
-					map((user) => removeSuccess({ userRemoved: user })),
-					catchError((error) => (error.status == 400 ? of(setErrors({ errors: error.error.errors })) : EMPTY))
-				)
-			)
+			exhaustMap((action) => this.service.remove(action.id).pipe(map((user) => removeSuccess({ userRemoved: user }))))
 		)
 	);
 	removeSuccessUsers$ = createEffect(

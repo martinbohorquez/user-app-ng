@@ -9,7 +9,6 @@ import {
 	resetUser,
 	setErrors,
 	setPaginator,
-	setUserForm,
 	updateSuccess
 } from './users.action';
 
@@ -28,12 +27,6 @@ export const usersReducer = createReducer(
 		paginator: state.paginator,
 		user: { ...user },
 		errors: {}
-	})),
-	on(setUserForm, (state, { user }) => ({
-		users: state.users,
-		paginator: state.paginator,
-		user: { ...user },
-		errors: state.errors
 	})),
 	on(findAll, (state, { users }) => ({
 		users: [...users],
@@ -62,14 +55,14 @@ export const usersReducer = createReducer(
 	on(addSuccess, (state, { userNew }) => ({
 		users: [...state.users, { ...userNew }],
 		paginator: state.paginator,
-		user: { ...userNew },
-		errors: state.errors
+		user: { ...user },
+		errors: {}
 	})),
 	on(updateSuccess, (state, { userUpdated }) => ({
 		users: state.users.map((u) => (u.id == userUpdated.id ? { ...userUpdated } : u)),
 		paginator: state.paginator,
-		user: state.user,
-		errors: state.errors
+		user: { ...user },
+		errors: {}
 	})),
 	on(removeSuccess, (state, { userRemoved }) => ({
 		users: state.users.filter((user) => user.id != userRemoved.id),
@@ -77,10 +70,10 @@ export const usersReducer = createReducer(
 		user: state.user,
 		errors: state.errors
 	})),
-	on(setErrors, (state, { errors }) => ({
+	on(setErrors, (state, { userForm, errors }) => ({
 		users: state.users,
 		paginator: state.paginator,
-		user: state.user,
+		user: { ...userForm },
 		errors: { ...errors }
 	}))
 );

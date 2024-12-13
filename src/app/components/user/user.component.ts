@@ -48,7 +48,7 @@ export class UserComponent implements OnInit {
 
 		Swal.fire({
 			title: 'Seguro que desea eliminar?',
-			text: "Cuidado el '" + username + "' será eliminado del sistema!",
+			text: "Cuidado el usuario '" + username + "' será eliminado del sistema!",
 			icon: 'warning',
 			showCancelButton: true,
 			confirmButtonColor: '#3085d6',

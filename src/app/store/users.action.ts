@@ -4,7 +4,6 @@ import { User } from '../models/users';
 export const load = createAction('load', props<{ page: number }>());
 
 export const resetUser = createAction('resetUser');
-export const setUserForm = createAction('setUserForm', props<{ user: User }>());
 
 export const findAll = createAction('findAll', props<{ users: User[] }>());
 export const findAllPageable = createAction('findAll', props<{ users: User[]; paginator: any }>());
@@ -19,4 +18,4 @@ export const updateSuccess = createAction('updateSuccess', props<{ userUpdated: 
 export const remove = createAction('remove', props<{ id: number }>());
 export const removeSuccess = createAction('removeSuccess', props<{ userRemoved: User }>());
 
-export const setErrors = createAction('setActions', props<{ errors: any }>());
+export const setErrors = createAction('setActions', props<{ userForm: User; errors: any }>());
