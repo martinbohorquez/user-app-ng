@@ -1,14 +1,14 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { BACKEND_URL } from '../config/config';
 import { User } from '../models/users';
 
 @Injectable({
 	providedIn: 'root'
 })
 export class UserService {
-	private url: string = 'http://localhost:8080/api/users';
-	private users: User[] = [];
+	private url: string = `${BACKEND_URL}/api/users`;
 
 	constructor(private http: HttpClient) {}
 
