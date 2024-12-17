@@ -1,6 +1,9 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
+import { Store } from '@ngrx/store';
 import { User } from '../../models/users';
+import { add, find, resetUser, update } from '../../store/users/users.action';
 
 @Component({
 	selector: 'user-form',
@@ -9,25 +12,39 @@ import { User } from '../../models/users';
 	templateUrl: './user-form.component.html',
 	styleUrl: './user-form.component.css'
 })
-export class UserFormComponent {
-	@Input() user: User;
+export class UserFormComponent implements OnInit {
+	user: User;
+	errors: any = {};
 
-	@Output() newUserEventEmitter: EventEmitter<User> = new EventEmitter();
-
-	constructor() {
+	constructor(private store: Store<{ users: any }>, private route: ActivatedRoute) {
 		this.user = new User();
+
+		this.store.select('users').subscribe((state) => {
+			this.errors = state.errors;
+			this.user = { ...state.user };
+		});
+	}
+
+	ngOnInit(): void {
+		this.store.dispatch(resetUser());
+		this.route.paramMap.subscribe((params) => {
+			const id: number = +(params.get('id') || '0');
+			if (id > 0) {
+				this.store.dispatch(find({ id }));
+			}
+		});
 	}
 
 	onSubmit(userForm: NgForm): void {
-		if (userForm.valid) {
-			this.newUserEventEmitter.emit({ ...this.user });
+		if (this.user.id > 0) {
+			this.store.dispatch(update({ userUpdated: this.user }));
+		} else {
+			this.store.dispatch(add({ userNew: this.user }));
 		}
-		userForm.reset();
-		userForm.resetForm();
 	}
 
 	onClear(userForm: NgForm): void {
-		this.user = new User();
+		this.store.dispatch(resetUser());
 		userForm.reset();
 		userForm.resetForm();
 	}
